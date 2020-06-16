@@ -406,11 +406,16 @@ class FluentParser(var withSpans: Boolean = false) {
                 }
             }
 
-            if (element is TextElement && trimmed.size > 1) {
+            if (trimmed.isNotEmpty()) {
                 val prev = trimmed.last()
                 if (prev is TextElement) {
                     // Join adjacent TextElements by replacing them with their sum.
-                    val sum = TextElement(prev.value + element.value)
+                    val sum = TextElement(
+                        prev.value + when (element) {
+                            is TextElement -> element.value
+                            else -> (element as Indent).value
+                        }
+                    )
                     if (this.withSpans) {
                         val start = prev.span?.start
                         val end = element.span?.end
